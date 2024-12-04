@@ -1,11 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {PieChartModule} from "@swimlane/ngx-charts";
-import * as DummyData from "../../data";
 import {Color, LegendPosition, ScaleType} from "@swimlane/ngx-charts";
 import {OlympicService} from "../../core/services/olympic.service";
-import {Country} from "../../models/Country";
-import {Observable, of} from "rxjs";
-import {map} from "d3";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-pie-chart',
@@ -17,14 +14,12 @@ import {map} from "d3";
   styleUrl: './pie-chart.component.scss'
 })
 export class PieChartComponent implements OnInit {
-  public olympics$: Observable<any> = of(null);
-  data3 :{name: string, value: number}[] = [];
-  data  = DummyData.totalPopulation;
   view: [number, number] = [700, 400];
+  data : {name: string; value:number}[] = [];
 
   // Options
   gradient: boolean = true;
-  showLegend: boolean = true;
+  showLegend: boolean = false;
   showLabels: boolean = true;
   isDoughnut: boolean = false;
   legendPosition: LegendPosition = LegendPosition.Below;
@@ -32,24 +27,27 @@ export class PieChartComponent implements OnInit {
     name: 'scheme',
     selectable: true,
     group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA']
+    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA', '#000000']
   }
 
-  animation = true;
+  animation = false;
   labels = true;
 
-  constructor(private olympicService: OlympicService) {}
+  constructor(private olympicService: OlympicService, private router: Router) {}
 
   ngOnInit(): void {
-    this.olympics$ = this.olympicService.getOlympics();
+    this.olympicService.getPieChartOlympics().subscribe(d => {
+      this.data = [...d];
+    })
   }
 
   percentageFormatter(data: any): string {
     return data.value + "%";
   }
 
-  onSelect(data: string): void {
+  onSelect(data: {name: string; value: number; label: string}): void {
     console.log('Item clicked', JSON.parse(JSON.stringify(data)));
+    this.router.navigateByUrl(`country/${this.olympicService.getCountryIdByName(data.name)}`);
   }
 
   onActivate(data: string): void {
