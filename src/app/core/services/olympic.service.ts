@@ -9,7 +9,7 @@ import {Country} from "../../models/Country";
 })
 export class OlympicService {
   private olympicUrl = './assets/mock/olympic.json';
-  private olympics$ = new BehaviorSubject<any>(undefined);
+  private olympics$ = new BehaviorSubject<Country[]>([]);
   private countries: Country[] = [];
   public  pieData: {name: string; value:number}[] = [];
   public  lineData: {name: string; series: {value:number; name: string}[]}[] = [{name: '', series: []}];
@@ -26,7 +26,7 @@ export class OlympicService {
         // TODO: improve error handling
         console.error(error);
         // can be useful to end loading state and let the user know something went wrong
-        this.olympics$.next(null);
+        this.olympics$.next([]);
         return caught;
       })
     );
@@ -39,6 +39,7 @@ export class OlympicService {
   getPieChartOlympics(): Observable<{ name: string; value: number }[]> {
     this.getOlympics()
         .subscribe((countries: Country[]) => {
+         console.log(countries);
           this.countries = countries;
             this.countries.map(country => {
               let d = {name: '', value: 0};

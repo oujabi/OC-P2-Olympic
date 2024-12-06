@@ -3,19 +3,23 @@ import {PieChartModule} from "@swimlane/ngx-charts";
 import {Color, LegendPosition, ScaleType} from "@swimlane/ngx-charts";
 import {OlympicService} from "../../core/services/olympic.service";
 import {Router} from "@angular/router";
+import {Observable, of,  Subject, takeUntil, tap} from "rxjs";
+import {Country} from "../../models/Country";
 
 @Component({
   selector: 'app-pie-chart',
   standalone: true,
   imports: [
-    PieChartModule
+    PieChartModule,
   ],
   templateUrl: './pie-chart.component.html',
   styleUrl: './pie-chart.component.scss'
 })
-export class PieChartComponent implements OnInit {
+export class PieChartComponent implements OnInit, OnDestroy {
   view: [number, number] = [700, 400];
-  data : {name: string; value:number}[] = [];
+  pieData: {name: string; value:number}[] = [];
+  olympics$: Observable<Country[]> = of([]);
+  subject!: Subject<boolean>;
 
   // Options
   gradient: boolean = true;
@@ -36,9 +40,33 @@ export class PieChartComponent implements OnInit {
   constructor(private olympicService: OlympicService, private router: Router) {}
 
   ngOnInit(): void {
-    this.olympicService.getPieChartOlympics().subscribe(d => {
-      this.data = [...d];
-    })
+    this.olympics$ = this.olympicService.getOlympics();
+    this.subject = new Subject();
+     this.olympics$.pipe(
+       takeUntil(this.subject),
+       tap((value) => this.getPieChartOlympics(value)
+       )
+     ).subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.subject.next(true);
+  }
+
+  getPieChartOlympics(countries : any): void {
+    if ( countries.length ) {
+     this.pieData = countries.map((country: Country) => {
+        let d = {name: '', value: 0};
+        d.name = country.country;
+        country.participations.map(participation => {
+          d.value += participation.medalsCount;
+        })
+
+        return d;
+      })
+    } else {
+      this.pieData = [];
+    }
   }
 
   percentageFormatter(data: any): string {
