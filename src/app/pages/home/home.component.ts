@@ -7,13 +7,10 @@ import {AsyncPipe} from "@angular/common";
   selector: 'app-home',
   standalone: true,
   imports: [
-    PieChartComponent,
-    AsyncPipe
+    PieChartComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 
-export class HomeComponent {
-  public olympics$: Observable<any> = of(null);
-}
+export class HomeComponent {}

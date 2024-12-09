@@ -3,14 +3,16 @@ import {PieChartModule} from "@swimlane/ngx-charts";
 import {Color, LegendPosition, ScaleType} from "@swimlane/ngx-charts";
 import {OlympicService} from "../../core/services/olympic.service";
 import {Router} from "@angular/router";
-import {Observable, of,  Subject, takeUntil, tap} from "rxjs";
+import { Observable, of, Subject, takeUntil, tap} from "rxjs";
 import {Country} from "../../models/Country";
+import {StatistiqueComponent} from "../../statistique/statistique.component";
 
 @Component({
   selector: 'app-pie-chart',
   standalone: true,
   imports: [
     PieChartModule,
+    StatistiqueComponent
   ],
   templateUrl: './pie-chart.component.html',
   styleUrl: './pie-chart.component.scss'
@@ -19,7 +21,11 @@ export class PieChartComponent implements OnInit, OnDestroy {
   view: [number, number] = [700, 400];
   pieData: {name: string; value:number}[] = [];
   olympics$: Observable<Country[]> = of([]);
-  subject!: Subject<boolean>;
+  subject: Subject<boolean> = new Subject<boolean>();
+  titleJOs: string = "Number of JOs";
+  nbJOs: number = 0;
+  titleCountries: string = "Number of Countries";
+  nbCountries: number = 0;
 
   // Options
   gradient: boolean = true;
@@ -31,13 +37,14 @@ export class PieChartComponent implements OnInit, OnDestroy {
     name: 'scheme',
     selectable: true,
     group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA', '#000000']
+    domain: ['#793d52', '#bfe0f2', '#89a2dc', '#956165', '#9780a2', '#b8cce7']
   }
 
-  animation = false;
-  labels = true;
+  animation = true;
 
-  constructor(private olympicService: OlympicService, private router: Router) {}
+  constructor(
+    private olympicService: OlympicService,
+    private router: Router) {}
 
   ngOnInit(): void {
     this.olympics$ = this.olympicService.getOlympics();
@@ -58,19 +65,21 @@ export class PieChartComponent implements OnInit, OnDestroy {
      this.pieData = countries.map((country: Country) => {
         let d = {name: '', value: 0};
         d.name = country.country;
+        console.log(country.participations);
         country.participations.map(participation => {
           d.value += participation.medalsCount;
+          this.nbJOs++;
         })
 
         return d;
-      })
+     })
+
+     this.nbCountries = this.pieData.length;
+     this.nbJOs = this.nbJOs /this.nbCountries
     } else {
       this.pieData = [];
     }
-  }
 
-  percentageFormatter(data: any): string {
-    return data.value + "%";
   }
 
   onSelect(data: {name: string; value: number; label: string}): void {

@@ -15,7 +15,9 @@ export class OlympicService {
   public  lineData: {name: string; series: {value:number; name: string}[]}[] = [{name: '', series: []}];
   private pieChartData$ = new BehaviorSubject<{ name: string; value: number }[]>([]);
   private lineChartData$ = new BehaviorSubject<{name: string; series: {value:number; name: string}[]}[]>([]);
+  private lineChartAthlete$ = new BehaviorSubject<number>(0);
   public dataId: number = 0;
+  public nbAthlete: number = 0;
 
   constructor(private http: HttpClient) {}
 
@@ -36,24 +38,6 @@ export class OlympicService {
     return this.olympics$.asObservable();
   }
 
-  getPieChartOlympics(): Observable<{ name: string; value: number }[]> {
-    this.getOlympics()
-        .subscribe((countries: Country[]) => {
-         console.log(countries);
-          this.countries = countries;
-            this.countries.map(country => {
-              let d = {name: '', value: 0};
-              d.name = country.country;
-              country.participations.map(participation => {
-                d.value += participation.medalsCount;
-              })
-
-              this.pieData.push(d);
-            })
-          this.pieChartData$.next(this.pieData);
-        });
-    return this.pieChartData$;
-  }
 
   getCountryIdByName(name: string) {
     this.getOlympics()
@@ -71,8 +55,6 @@ export class OlympicService {
   }
 
   getLineChartOlympics(countryId: number): Observable<{name: string; series: {value:number; name: string}[]}[]> {
-
-    console.log("La valeur de l'id :", countryId);
     this.getOlympics()
           .subscribe((countries: Country[])  => {
             this.countries = countries;
@@ -93,5 +75,26 @@ export class OlympicService {
 
           })
     return this.lineChartData$;
+  }
+
+  getTotalAthlete(countryId: number) {
+    this.getOlympics()
+      .subscribe((olympics: any[])  => {
+        this.countries.map(olympic => {
+          console.log(olympic);
+          if (olympic.id == countryId) {
+
+            olympic.participations.map(participation => {
+              this.nbAthlete += participation.athleteCount;
+              console.log(this.nbAthlete);
+            })
+
+            this.lineChartAthlete$.next(this.nbAthlete);
+          }
+        })
+
+      })
+
+    return this.lineChartAthlete$;
   }
 }
