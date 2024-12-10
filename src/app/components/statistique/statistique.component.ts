@@ -8,6 +8,7 @@ import {Observable} from "rxjs";
   templateUrl: './statistique.component.html',
   styleUrl: './statistique.component.scss'
 })
+
 export class StatistiqueComponent {
   @Input() title: string = "Numbers of entries";
   @Input() data: number = 0;

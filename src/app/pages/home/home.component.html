@@ -1,6 +1,87 @@
-<div class="wrapper">
-  <div class="margin-element-chart"></div>
-  <app-pie-chart/>
+<div class="container">
+
+  <h1 class="main-title">Medals per Country</h1>
+
+  <div class="statistique-container">
+    <app-statistique [title] = "dataJO.name" [data] = "dataJO.value"/>
+    <app-statistique [title] = "dataCountries.name" [data] = "dataCountries.value"/>
+  </div>
+
+  <ngx-charts-pie-chart
+    [view]="view"
+    [scheme]="colorScheme"
+    [results]="pieData"
+    [gradient]="gradient"
+    [legend]="showLegend"
+    [legendPosition]="legendPosition"
+    [animations]="animation"
+    [labels]="showLabels"
+    [doughnut]="isDoughnut"
+    (select)="onSelect($event)"
+
+  >
+    <ng-template #tooltipTemplate let-model="model">
+      <div>
+        {{model.name}}
+      </div>
+      <div>{{"🏅" + " " + model.value}}</div>
+    </ng-template>
+  </ngx-charts-pie-chart>
+
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<div class="wrapper">-->
+<!--  <div class="margin-element-chart"></div>-->
+<!--&lt;!&ndash;  <app-pie-chart/>&ndash;&gt;-->
+<!--  <div class="main-title-wrapper">-->
+<!--    <h1 class="main-title">Medals per Country</h1>-->
+<!--  </div>-->
+
+<!--  <div class="statistique-container">-->
+<!--    <app-statistique [title] = "titleJOs" [data] = "nbJOs"/>-->
+<!--    <app-statistique [title] = "titleCountries" [data] = "nbCountries"/>-->
+<!--  </div>-->
+
+<!--  <div class="wrapper-pie-chart">-->
+<!--    <ngx-charts-pie-chart-->
+<!--      [view]="view"-->
+<!--      [scheme]="colorScheme"-->
+<!--      [results]="pieData"-->
+<!--      [gradient]="gradient"-->
+<!--      [legend]="showLegend"-->
+<!--      [legendPosition]="legendPosition"-->
+<!--      [animations]="animation"-->
+<!--      [labels]="showLabels"-->
+<!--      [doughnut]="isDoughnut"-->
+<!--      (select)="onSelect($event)"-->
+<!--      (activate)="onActivate($event)"-->
+<!--      (deactivate)="onDeactivate($event)"-->
+<!--    >-->
+<!--      <ng-template #tooltipTemplate let-model="model">-->
+<!--        <div>-->
+<!--          {{model.name}}-->
+<!--        </div>-->
+<!--        <div>{{"🏅" + " " + model.value}}</div>-->
+<!--      </ng-template>-->
+<!--    </ngx-charts-pie-chart>-->
+<!--  </div>-->
+
+<!--</div>-->
 
 

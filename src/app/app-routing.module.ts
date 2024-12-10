@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
-import {CountryComponent} from "./pages/country/country.component";
+import {OlympicComponent} from "./pages/olympic/olympic.component";
 
 const routes: Routes = [
   {
@@ -10,8 +10,8 @@ const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'country/:countryId',
-    component: CountryComponent,
+    path: 'olympic/:olympicId',
+    component: OlympicComponent,
   },
   {
     path: '**', // wildcard
