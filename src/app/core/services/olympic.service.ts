@@ -19,9 +19,9 @@ export class OlympicService {
   loadInitialData() {
     return this.http.get<Olympic[]>(this.olympicUrl).pipe(
       tap(
-        (value) => this.olympics$.next(value)
+        (value: Olympic[]): void => this.olympics$.next(value)
       ),
-      catchError((error, caught) => {
+      catchError((error, caught: Observable<Olympic[]> ): Observable<Olympic[]> => {
         console.error(error);
         this.olympics$.next([]);
         return caught;
@@ -35,8 +35,8 @@ export class OlympicService {
 
   getOlympicIdByName(name: string): number {
     this.olympics$.pipe()
-      .subscribe((olympics: Olympic[])  => {
-        olympics.map((olympic: Olympic) => {
+      .subscribe((olympics: Olympic[]): void  => {
+        olympics.map((olympic: Olympic): void => {
           if (olympic.country === name) {
             this.olympicId = olympic.id;
           }

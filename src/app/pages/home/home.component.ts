@@ -3,11 +3,11 @@ import {PieChartModule} from "@swimlane/ngx-charts";
 import {Color, LegendPosition, ScaleType} from "@swimlane/ngx-charts";
 import {OlympicService} from "../../core/services/olympic.service";
 import {Router} from "@angular/router";
-import { Observable, of, Subject, takeUntil, tap} from "rxjs";
+import {Observable, of, Subject, takeUntil, tap} from "rxjs";
 import {StatistiqueComponent} from "../../components/statistique/statistique.component";
 import {Olympic} from "../../core/models/Olympic";
 import {Participation} from "../../core/models/Participation";
-import {BasicDTO} from "../../core/dto/BasicDTO";
+import {ChartDTO} from "../../core/dto/ChartDTO";
 
 @Component({
   selector: 'app-home',
@@ -26,11 +26,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   subject: Subject<boolean> = new Subject<boolean>();
 
   // Statistique Data and main title
-  dataJO: BasicDTO = {name: "Number of JOs", value: 0};
-  dataCountries: BasicDTO = {name: "Number of Countries", value: 0};
+  dataJO: ChartDTO = {name: "Number of JOs", value: 0};
+  dataCountries: ChartDTO = {name: "Number of Countries", value: 0};
 
   // Data send in PieChart with results property
-  pieData: {name: string; value:number}[] = [];
+  pieData: ChartDTO[] = [];
 
   // PieChart options.
   view: [number, number] = [700, 400];
@@ -43,7 +43,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   gradient: boolean = true;
   showLegend: boolean = false;
   legendPosition: LegendPosition = LegendPosition.Below;
-  animation = true;
+  animation: boolean = true;
   showLabels: boolean = true;
   isDoughnut: boolean = false;
 
@@ -70,8 +70,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Method use in tap for extract useful data.
   getPieChartOlympics(Olympics: Olympic[]): void {
     if ( Olympics.length ) {
-      this.pieData = Olympics.map((olympic: Olympic): BasicDTO => {
-        let dataChart: BasicDTO = {name: '', value: 0};
+      this.pieData = Olympics.map((olympic: Olympic): ChartDTO => {
+        let dataChart: ChartDTO = {name: '', value: 0};
         dataChart.name = olympic.country;
 
         olympic.participations.map((participation: Participation) => {

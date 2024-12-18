@@ -5,8 +5,9 @@ import {ActivatedRoute, RouterLink} from "@angular/router";
 import {StatistiqueComponent} from "../../components/statistique/statistique.component";
 import {Observable, Subject, takeUntil, BehaviorSubject, tap} from "rxjs";
 import {LineChartDTO} from "../../core/dto/LineChartDTO";
-import {BasicDTO} from "../../core/dto/BasicDTO";
+import {ChartDTO} from "../../core/dto/ChartDTO";
 import {Olympic} from "../../core/models/Olympic";
+import {Router} from "@angular/router";
 import {Participation} from "../../core/models/Participation";
 
 @Component({
@@ -27,9 +28,9 @@ export class OlympicComponent implements OnInit, OnDestroy {
 
   // Statistique Data and Main Title
   countryName: string = "";
-  dataEntries: BasicDTO = {name: "Number of entries", value: 0};
-  dataMedals: BasicDTO = {name: "Total number medals", value: 0};
-  dataAthletes: BasicDTO = {name: "Total number of athlete", value: 0};
+  dataEntries: ChartDTO = {name: "Number of entries", value: 0};
+  dataMedals: ChartDTO = {name: "Total number medals", value: 0};
+  dataAthletes: ChartDTO = {name: "Total number of athlete", value: 0};
   olympics$: Observable<Olympic[]> = new BehaviorSubject<Olympic[]>([]);
   subject: Subject<boolean> = new Subject<boolean>();
 
@@ -57,20 +58,22 @@ export class OlympicComponent implements OnInit, OnDestroy {
   showLabels: boolean = true;
 
   constructor(
-    private route : ActivatedRoute,
+    private route: ActivatedRoute,
     private olympicService: OlympicService,
+    private router: Router
   ) {}
 
   // First method in life cycle component. Use for extract data to send in the view.
-  ngOnInit() {
+  ngOnInit(): void {
     this.olympicId = this.route.snapshot.params['olympicId'];
     this.olympics$ = this.olympicService.getOlympics();
+
 
     this.subject = new Subject();
     this.olympics$
       .pipe(
         takeUntil(this.subject),
-        tap((olympics: Olympic[]) => {
+        tap((olympics: Olympic[]): void => {
           this.getLineChartOlympics(this.olympicId, olympics);
 
           //Data to send in lineChart
@@ -79,11 +82,16 @@ export class OlympicComponent implements OnInit, OnDestroy {
           //Data to send in statistique
           this.countryName = this.lineChartData.name;
           this.dataEntries.value = this.lineChartData.series.length;
-          this.lineChartData.series.map( (set: BasicDTO ) => {
+          this.lineChartData.series.map( (set: ChartDTO ): void => {
             this.dataMedals.value += set.value;
           });
         })
       ).subscribe();
+
+    //Redirection if no Olympic equal to OlympicId.
+    if (this.lineChartDatas[0].name === "" && this.lineChartDatas[0].series.length === 0 ) {
+      this.router.navigateByUrl('**');
+    }
   }
 
   // Last method in life cycle component and unsubscribe Observable Olympics$
@@ -92,12 +100,12 @@ export class OlympicComponent implements OnInit, OnDestroy {
   }
 
   // Method use in tap for extract useful data.
-  getLineChartOlympics(olympicId: number, olympics: Olympic[]) {
-    olympics.map((olympic: Olympic) => {
+  getLineChartOlympics(olympicId: number, olympics: Olympic[]): void {
+    olympics.map((olympic: Olympic): void => {
       if (olympic.id == olympicId) {
         this.lineChartData.name = olympic.country;
-        olympic.participations.map((participation: Participation) => {
-          let set: BasicDTO = {name:'', value:0};
+        olympic.participations.map((participation: Participation): void => {
+          let set: ChartDTO = {name:'', value:0};
           set.name = participation.year.toString();
           set.value = participation.medalsCount;
           this.dataAthletes.value += participation.athleteCount;
